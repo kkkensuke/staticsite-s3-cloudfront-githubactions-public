@@ -12,5 +12,6 @@ Github Action workflow is defined under `/.github` directory. To use it, you hav
 
 ### HOW DEPLOY WORK
 1. App is build via Github actions
+1. Github assumes IAM role for following deploy actions.
 1. Deploy built app (under ./build directory as default) to S3 bucket.
 1. Invalidate CloudFront chache.
