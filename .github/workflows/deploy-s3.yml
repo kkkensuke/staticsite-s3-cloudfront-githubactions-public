@@ -1,0 +1,47 @@
+name: Upload files to S3
+
+on:
+  push:
+    branches:
+    - main
+
+env:
+  MY_AWS_REGION: '<YOUR AWS REGION>'
+  AWS_ROLENAME: '<YOUR AWS ROLE>'
+  AWS_S3_BUCKET: '<YOUR S3 BUCKET>'
+  SOURCE_DIR: './build'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+    - name: Checkout
+      uses: actions/checkout@master
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '16' # 使用するNode.jsのバージョン
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Build project
+      run: npm run build
+
+    - name: Configure AWS credentials with IAM Role
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/${{ env.AWS_ROLENAME }}
+        aws-region: ${{ env.MY_AWS_REGION }}
+    - name: Sync files to S3
+      run: |
+          aws s3 sync ${{ env.SOURCE_DIR }} s3://${{ env.AWS_S3_BUCKET }}/ --delete --exclude '.*git*'
+    - name: Invalidate CloudFront Cache
+      run: |
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
+            --paths "/*"
