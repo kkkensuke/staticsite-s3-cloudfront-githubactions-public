@@ -4,6 +4,12 @@ This repository contains AWS S3, CloudFront, Route53, Route53 resources configur
 ## AWS Resources
 AWS resources are configured under `/aws` directory.
 sensitive information is masked so when you use this repository to create resources for you, you need to replace masked value to yours.
+`aws/` include below resources
+- Route53 Host zone, Route53 records
+- CloudFront Distribution
+- S3 Bucket, bucket policy
+
+In order to build your own resources, you have to install terraform version v1.8.1.
 
 ## Github Action
 Github Action workflow is defined under `/.github` directory. To use it, you have to setup github actions secrets as below on your github repository.
